@@ -1,0 +1,4 @@
+[package]
+name = "matcher-benchmarks"
+version = "0.1.0"
+authors = ["Tibor Benke <tibor.benke@balabit.com>"]
