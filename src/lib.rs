@@ -2,6 +2,7 @@
 #![plugin(stainless)]
 extern crate actiondb;
 extern crate regex;
+pub mod suites;
 
 use actiondb::Matcher;
 use actiondb::matcher::MatcherFactory;
