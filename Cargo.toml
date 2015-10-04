@@ -2,3 +2,10 @@
 name = "matcher-benchmarks"
 version = "0.1.0"
 authors = ["Tibor Benke <tibor.benke@balabit.com>"]
+
+[dependencies]
+stainless = "0.1"
+regex = "0.1"
+
+[dependencies.actiondb]
+path = "../actiondb"
