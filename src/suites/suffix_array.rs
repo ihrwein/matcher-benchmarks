@@ -1,3 +1,34 @@
+use actiondb::matcher::trie::parser_factory::TrieParserFactory;
+use actiondb::matcher::MatcherFactory;
+
+use MatcherSuite;
+use self::suffix_array::impls::SuffixTable;
+
+pub struct SuffixArrayMatcherFactory;
+
+impl MatcherFactory for SuffixArrayMatcherFactory {
+    type Matcher = SuffixTable;
+
+    fn new_matcher() -> Self::Matcher {
+        SuffixTable::new()
+    }
+}
+
+pub struct SuffixArrayMatcherSuite;
+
+impl MatcherSuite for SuffixArrayMatcherSuite {
+    type Matcher = SuffixTable;
+    type ParserFactory = TrieParserFactory;
+    type MatcherFactory = SuffixArrayMatcherFactory;
+
+    fn parser_factory() -> Self::ParserFactory {
+        TrieParserFactory
+    }
+    fn matcher_factory() -> Self::MatcherFactory {
+        SuffixArrayMatcherFactory
+    }
+}
+
 mod suffix_array {
     use actiondb::matcher::Pattern;
     use actiondb::parsers::Parser;
@@ -29,7 +60,7 @@ mod suffix_array {
         fn parser(&self) -> &Box<Parser>;
     }
 
-    mod impls {
+    pub mod impls {
         use super::{
             SuffixArray,
             Entry,
