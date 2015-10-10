@@ -45,6 +45,7 @@ mod suffix_array {
 
     pub trait LiteralEntry: Entry + Clone {
         fn literal(&self) -> &String;
+
     }
 
     pub trait ParserEntry: Entry + Clone {
