@@ -6,6 +6,8 @@ use self::impls::SuffixTable;
 
 mod interface;
 mod impls;
+#[cfg(test)]
+mod test;
 
 pub struct SuffixArrayMatcherFactory;
 
