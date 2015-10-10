@@ -237,11 +237,4 @@ impl MatcherSuite for RegexMatcherSuite {
     type Matcher = RegexMatcher;
     type ParserFactory = RegexParserFactory;
     type MatcherFactory = RegexMatcherFactory;
-
-    fn parser_factory() -> Self::ParserFactory {
-        RegexParserFactory
-    }
-    fn matcher_factory() -> Self::MatcherFactory {
-        RegexMatcherFactory
-    }
 }

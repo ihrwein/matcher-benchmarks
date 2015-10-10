@@ -20,13 +20,6 @@ impl MatcherSuite for SuffixArrayMatcherSuite {
     type Matcher = SuffixTable;
     type ParserFactory = TrieParserFactory;
     type MatcherFactory = SuffixArrayMatcherFactory;
-
-    fn parser_factory() -> Self::ParserFactory {
-        TrieParserFactory
-    }
-    fn matcher_factory() -> Self::MatcherFactory {
-        SuffixArrayMatcherFactory
-    }
 }
 
 mod suffix_array {
@@ -52,7 +45,6 @@ mod suffix_array {
 
     pub trait LiteralEntry: Entry + Clone {
         fn literal(&self) -> &String;
-
     }
 
     pub trait ParserEntry: Entry + Clone {
