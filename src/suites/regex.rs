@@ -120,7 +120,7 @@ pub mod parsers {
     pub struct RegexParserFactory;
 
     impl ParserFactory for RegexParserFactory {
-        fn new_set<'a>(set: &str, name: Option<&str>, opt_params: Option<Vec<OptionalParameter<'a>>>) -> Box<Parser> {
+        fn new_set<'a>(set: &str, name: Option<&str>, _: Option<Vec<OptionalParameter<'a>>>) -> Box<Parser> {
             let regex = Regex::new(&format!("^[{}]", set)).ok().expect("Failed to create a SetParser");
             let parser = SetParser {
                 name: name.map(|name| name.to_string()),
@@ -129,7 +129,7 @@ pub mod parsers {
 
             Box::new(parser)
         }
-        fn new_int<'a>(name: Option<&str>, opt_params: Option<Vec<OptionalParameter<'a>>>) -> Box<Parser> {
+        fn new_int<'a>(name: Option<&str>, _: Option<Vec<OptionalParameter<'a>>>) -> Box<Parser> {
             let regex = Regex::new(&format!("^[0123456789]")).ok().expect("Failed to create an IntParser");
             let parser = IntParser {
                 delegate: SetParser {
