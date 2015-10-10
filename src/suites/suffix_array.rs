@@ -3,28 +3,29 @@ mod suffix_array {
     use actiondb::parsers::Parser;
     use actiondb::matcher::result::MatchResult;
 
-    pub trait SuffixArray: Sized {
+    pub trait SuffixArray: Clone {
         type LiteralEntry: LiteralEntry;
         type ParserEntry: ParserEntry;
         fn insert(&mut self, pattern: Pattern);
-        fn parse(&self, value: &str) -> Option<MatchResult>;
+        fn longest_common_prefix(&self, value: &str) -> Option<(usize, usize)>;
     }
 
     pub trait Entry {
         type SA: SuffixArray;
         fn pattern(&self) -> Option<&Pattern>;
-        fn parse(&self, value: &str) -> Option<MatchResult>;
         fn set_pattern(&mut self, pattern: Option<Pattern>);
         fn child(&self) -> Option<&Self::SA>;
         fn child_mut(&mut self) -> Option<&mut Self::SA>;
         fn set_child(&mut self, child: Option<Self::SA>);
     }
 
-    pub trait LiteralEntry: Entry {
+    pub trait LiteralEntry: Entry + Clone {
         fn literal(&self) -> &String;
+
     }
 
-    pub trait ParserEntry: Entry {
+    pub trait ParserEntry: Entry + Clone {
+        fn parse<'a, 'b>(&'a self, value: &'b str) -> Option<MatchResult<'a, 'b>>;
         fn parser(&self) -> &Box<Parser>;
     }
 
@@ -36,15 +37,19 @@ mod suffix_array {
             ParserEntry
         };
 
-        use actiondb::parsers::Parser;
+        use actiondb::parsers::{
+            Parser,
+            ParseResult
+        };
+        use actiondb::matcher::Matcher;
         use actiondb::matcher::Pattern;
         use actiondb::matcher::compiled_pattern::TokenType;
         use actiondb::matcher::result::MatchResult;
         use actiondb::utils::CommonPrefix;
 
         use std::borrow::Borrow;
-        use std::cmp::Ordering;
 
+        #[derive(Debug, Clone)]
         pub struct SuffixTable {
             literal_entries: Vec<LiteralE>,
             parser_entries: Vec<ParserE>,
@@ -55,22 +60,6 @@ mod suffix_array {
                 SuffixTable {
                     literal_entries: Vec::new(),
                     parser_entries: Vec::new()
-                }
-            }
-
-            pub fn parse_recurse(&self, value: &str) -> Option<MatchResult> {
-                let result = self.literal_entries.binary_search_by(|probe| {
-                    let s: &str = probe.literal().borrow();
-                    s.cmp(value)
-                });
-                match result {
-                    Ok(pos) => {
-                        //self.literal_entries.get(pos).expect("Failed to remove")
-                        None
-                    },
-                    Err(pos) => {
-                        None
-                    }
                 }
             }
         }
@@ -118,37 +107,44 @@ mod suffix_array {
                 }
             }
 
-            fn parse(&self, value: &str) -> Option<MatchResult> {
+            fn longest_common_prefix(&self, value: &str) -> Option<(usize, usize)> {
                 let result = self.literal_entries.binary_search_by(|probe| {
                     let s: &str = probe.literal().borrow();
                     s.cmp(value)
                 });
                 match result {
                     Ok(pos) => {
-                        let pattern = self.literal_entries.get(pos).expect("Failed to get() a literal entry").pattern();
-                        Some(MatchResult::new(pattern))
+                        let child = self.literal_entries.get(pos).expect("Failed to get() a literal entry");
+                        let common_prefix_len = child.literal().common_prefix_len(value);
+                        Some((pos, common_prefix_len))
                     },
                     Err(pos) => {
-                        if pos == 0 {
-                            for parser in &self.parser_entries {
-                                if let Some(result) = parser.parse(value) {
-                                    return Some(result);
-                                }
-                            }
-                            None
+                        if let Some(entry) = self.literal_entries.get(pos) {
+                            Some((pos, entry.literal().common_prefix_len(value)))
                         } else {
-                            let truncated_value = value.ltrunc()
                             None
                         }
-                    }
+                    },
                 }
             }
+
         }
 
+        #[derive(Debug)]
         pub struct ParserE {
             pattern: Option<Pattern>,
             parser: Box<Parser>,
             child: Option<SuffixTable>
+        }
+
+        impl Clone for ParserE {
+            fn clone(&self) -> ParserE {
+                ParserE {
+                    pattern: self.pattern.clone(),
+                    parser: self.parser.boxed_clone(),
+                    child: self.child.clone()
+                }
+            }
         }
 
         impl ParserE {
@@ -178,16 +174,41 @@ mod suffix_array {
             fn set_child(&mut self, child: Option<Self::SA>) {
                 self.child = child;
             }
-            fn parse(&self, value: &str) -> Option<MatchResult> {
-                None
-            }
         }
         impl ParserEntry for ParserE {
             fn parser(&self) -> &Box<Parser> {
                 &self.parser
             }
+            fn parse<'a, 'b>(&'a self, value: &'b str) -> Option<MatchResult<'a, 'b>> {
+                if let Some(kvpair) = self.parser.parse(value) {
+                    let value = value.ltrunc(kvpair.value().len());
+
+                    match self.child() {
+                        Some(child) => {
+                            if let Some(mut result) = child.parse(value) {
+                                result.insert(kvpair);
+                                Some(result)
+                            } else {
+                                None
+                            }
+                        },
+                        None => {
+                            if value.is_empty() {
+                                let mut result = MatchResult::new(self.pattern().expect("Failed to get the pattern"));
+                                result.insert(kvpair);
+                                Some(result)
+                            } else {
+                                None
+                            }
+                        }
+                    }
+                } else {
+                    None
+                }
+            }
         }
 
+        #[derive(Debug)]
         pub struct LiteralE {
             pattern: Option<Pattern>,
             literal: String,
@@ -203,6 +224,16 @@ mod suffix_array {
                 }
             }
         }
+        impl Clone for LiteralE {
+            fn clone(&self) -> LiteralE {
+                LiteralE {
+                    literal: self.literal.clone(),
+                    pattern: self.pattern.clone(),
+                    child: self.child.clone()
+                }
+            }
+        }
+
         impl Entry for LiteralE {
             type SA = SuffixTable;
             fn pattern(&self) -> Option<&Pattern> {
@@ -220,14 +251,51 @@ mod suffix_array {
             fn set_child(&mut self, child: Option<Self::SA>) {
                 self.child = child;
             }
-            fn parse(&self, value: &str) -> Option<MatchResult> {
-                None
-            }
         }
 
         impl LiteralEntry for LiteralE {
             fn literal(&self) -> &String {
                 &self.literal
+            }
+        }
+
+        impl Matcher for SuffixTable {
+            fn parse<'a, 'b>(&'a self, value: &'b str) -> Option<MatchResult<'a, 'b>> {
+                match self.longest_common_prefix(value) {
+                    Some((pos, len)) => {
+                        let child = self.literal_entries.get(pos).expect("Failed to get() a literal entry");
+                        if len == value.len() {
+                            if let Some(pattern) = child.pattern() {
+                                Some(MatchResult::new(pattern))
+                            } else {
+                                None
+                            }
+                        } else if len < value.len() {
+                            let value = value.ltrunc(len);
+                            if let Some(child) = child.child() {
+                                child.parse(value)
+                            } else {
+                                None
+                            }
+                        } else {
+                            None
+                        }
+                    },
+                    None => {
+                        for parser in &self.parser_entries {
+                            if let Some(result) = parser.parse(value) {
+                                return Some(result);
+                            }
+                        }
+                        None
+                    }
+                }
+            }
+            fn add_pattern(&mut self, pattern: Pattern) {
+                self.insert(pattern);
+            }
+            fn boxed_clone(&self) -> Box<Matcher> {
+                Box::new(self.clone())
             }
         }
     }
