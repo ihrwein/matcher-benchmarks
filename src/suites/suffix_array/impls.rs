@@ -29,6 +29,24 @@ impl SuffixTable {
             parser_entries: Vec::new()
         }
     }
+    fn longest_common_prefix_around_pos(&self, value: &str, pos: usize) -> (usize, usize) {
+        let mut min_pos = pos;
+        let mut min_len = 0;
+        if pos > 0 {
+            min_pos = pos - 1;
+        }
+
+        for i in min_pos..pos+1 {
+            if let Some(entry) = self.literal_entries.get(i) {
+                let len = entry.literal().common_prefix_len(value);
+                if len > min_len {
+                    min_pos = i;
+                    min_len = len;
+                }
+            }
+        }
+        (min_pos, min_len)
+    }
 }
 
 impl SuffixArray for SuffixTable {
@@ -86,8 +104,9 @@ impl SuffixArray for SuffixTable {
                 Some((pos, common_prefix_len))
             },
             Err(pos) => {
-                if let Some(entry) = self.literal_entries.get(pos) {
-                    Some((pos, entry.literal().common_prefix_len(value)))
+                let (min_pos, min_len) = self.longest_common_prefix_around_pos(value, pos);
+                if min_len > 0 {
+                    Some((min_pos, min_len))
                 } else {
                     None
                 }
@@ -175,7 +194,7 @@ impl ParserEntry for ParserE {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LiteralE {
     pattern: Option<Pattern>,
     literal: String,
@@ -188,15 +207,6 @@ impl LiteralE {
             literal: literal,
             pattern: None,
             child: None
-        }
-    }
-}
-impl Clone for LiteralE {
-    fn clone(&self) -> LiteralE {
-        LiteralE {
-            literal: self.literal.clone(),
-            pattern: self.pattern.clone(),
-            child: self.child.clone()
         }
     }
 }
