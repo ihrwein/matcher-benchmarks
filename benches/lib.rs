@@ -25,6 +25,7 @@ use matcher_benchmarks::suites::TrieMatcherSuite;
 use actiondb::matcher::trie::factory::TrieMatcherFactory;
 use matcher_benchmarks::suites::RegexMatcherSuite;
 use matcher_benchmarks::suites::regex::RegexParserFactory;
+use matcher_benchmarks::suites::SuffixArrayMatcherSuite;
 
 macro_rules! bench {
     ($test_name:ident, $test_message:expr, $suite:ty) => {
@@ -42,11 +43,13 @@ const TEST_MESSAGE_WHICH_MATCHES: &'static str = "martian source 10.0.106.201 fr
 bench!(bench_trie_matcher_when_message_matches, TEST_MESSAGE_WHICH_MATCHES, TrieMatcherSuite);
 bench!(bench_trie_matcher_with_regex_parsers_when_message_matches, TEST_MESSAGE_WHICH_MATCHES, TrieMatcherSuiteWithRegexParsers);
 bench!(bench_regex_matcher_when_message_matches, TEST_MESSAGE_WHICH_MATCHES, RegexMatcherSuite);
+bench!(bench_suffix_array_matcher_when_message_matches, TEST_MESSAGE_WHICH_MATCHES, SuffixArrayMatcherSuite);
 
 const TEST_MESSAGE_WHICH_DOES_NOT_MATCH: &'static str = r#"type=1400 audit(1444191210.403:63): apparmor="STATUS" operation="profile_replace" profile="unconfined" name="docker-default" pid=2782 comm="apparmor_parser"#;
 bench!(bench_trie_matcher_when_message_does_not_match, TEST_MESSAGE_WHICH_DOES_NOT_MATCH, TrieMatcherSuite);
 bench!(bench_trie_matcher_with_regex_parsers_when_message_does_not_match, TEST_MESSAGE_WHICH_DOES_NOT_MATCH, TrieMatcherSuiteWithRegexParsers);
 bench!(bench_regex_matcher_when_message_does_not_match, TEST_MESSAGE_WHICH_DOES_NOT_MATCH, RegexMatcherSuite);
+bench!(bench_suffix_array_matcher_when_message_does_not_match, TEST_MESSAGE_WHICH_DOES_NOT_MATCH, SuffixArrayMatcherSuite);
 
 struct TrieMatcherSuiteWithRegexParsers;
 
