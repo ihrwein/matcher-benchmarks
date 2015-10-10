@@ -22,9 +22,7 @@ fn create_matcher<T>() -> T::Matcher
 }
 
 use matcher_benchmarks::suites::TrieMatcherSuite;
-use actiondb::matcher::trie::factory::TrieMatcherFactory;
 use matcher_benchmarks::suites::RegexMatcherSuite;
-use matcher_benchmarks::suites::regex::RegexParserFactory;
 use matcher_benchmarks::suites::SuffixArrayMatcherSuite;
 
 macro_rules! bench {
@@ -57,11 +55,4 @@ impl MatcherSuite for TrieMatcherSuiteWithRegexParsers {
     type Matcher = <TrieMatcherSuite as MatcherSuite>::Matcher;
     type ParserFactory = <RegexMatcherSuite as MatcherSuite>::ParserFactory;
     type MatcherFactory = <TrieMatcherSuite as MatcherSuite>::MatcherFactory;
-
-    fn parser_factory() -> Self::ParserFactory {
-        RegexParserFactory
-    }
-    fn matcher_factory() -> Self::MatcherFactory {
-        TrieMatcherFactory
-    }
 }
