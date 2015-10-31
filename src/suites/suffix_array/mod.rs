@@ -1,7 +1,7 @@
 use actiondb::matcher::trie::parser_factory::TrieParserFactory;
 use actiondb::matcher::MatcherFactory;
 
-use MatcherSuite;
+use actiondb::matcher::MatcherSuite;
 use self::impls::SuffixTable;
 
 mod interface;

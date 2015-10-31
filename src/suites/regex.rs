@@ -229,7 +229,7 @@ pub use self::matcher::{
     RegexMatcherFactory
 };
 
-use MatcherSuite;
+use actiondb::matcher::MatcherSuite;
 
 pub struct RegexMatcherSuite;
 

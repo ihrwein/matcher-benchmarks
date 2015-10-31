@@ -6,7 +6,7 @@ extern crate actiondb;
 use actiondb::matcher::GenericFactory;
 use actiondb::matcher::Matcher;
 use actiondb::matcher::MatcherFactory;
-use matcher_benchmarks::*;
+use actiondb::matcher::MatcherSuite;
 use test::Bencher;
 use actiondb::parsers::ParserFactory;
 
@@ -21,7 +21,7 @@ fn create_matcher<T>() -> T::Matcher
     result.ok().expect("Failed to create a Matcher object")
 }
 
-use matcher_benchmarks::suites::TrieMatcherSuite;
+use actiondb::matcher::trie::TrieMatcherSuite;
 use matcher_benchmarks::suites::RegexMatcherSuite;
 use matcher_benchmarks::suites::SuffixArrayMatcherSuite;
 
