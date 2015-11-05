@@ -28,7 +28,6 @@ pub trait Entry {
 
 pub trait LiteralEntry: Entry + Clone {
     fn literal(&self) -> &String;
-
 }
 
 pub trait ParserEntry: Entry + Clone {
