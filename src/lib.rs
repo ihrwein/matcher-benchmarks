@@ -36,28 +36,28 @@ impl MatcherSuite for TrieMatcherSuiteWithRegexParsers {
 
 pub mod test_datas {
     pub mod pattern_500 {
-        pub const EXPECTED_UUID: &'static str = "e05d0227-5cae-45c9-96bd-121aef46f9b8";
-        pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = "statistics: max cache size 1 at Nov 9 15:02:42";
+        pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = "Authorized to pirar01, krb5 principal pirar01@LOCAL (krb5_kuserok)";
         pub const TEST_MESSAGE_WHICH_DOES_NOT_MATCH: &'static str = r#"[origin software="rsyslogd" swVersion="7.4.4" x-pid="665" x-info="http://www.rsyslog.com"] start"#;
         pub const PATTERN_FILE: &'static str = "/home/tibi/Documents/Diplomamunka/samples/default_500.json";
+        pub const EXPECTED_UUID: &'static str = "e05d0227-5cae-45c9-96bd-121aef46f9b8";
     }
     pub mod pattern_400 {
-        pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = "(ResourceName) Failed to call refresh: /usr/bin/nova-manage db sync returned 1 instead of one of [0] at /var/tmp/packstack/cd468d5155d64ab1b31d9dfed7c6b847/modules/nova/manifests/api.pp:100";
+        pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = "Authorized to pirar01, krb5 principal pirar01@LOCAL (krb5_kuserok)";
         pub const TEST_MESSAGE_WHICH_DOES_NOT_MATCH: &'static str = r#"[origin software="rsyslogd" swVersion="7.4.4" x-pid="665" x-info="http://www.rsyslog.com"] start"#;
         pub const PATTERN_FILE: &'static str = "/home/tibi/Documents/Diplomamunka/samples/default_400.json";
     }
     pub mod pattern_300 {
-        pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = "lost connection after CONNECT from unknown[192.168.0.2]";
+        pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = "Authorized to pirar01, krb5 principal pirar01@LOCAL (krb5_kuserok)";
         pub const TEST_MESSAGE_WHICH_DOES_NOT_MATCH: &'static str = r#"[origin software="rsyslogd" swVersion="7.4.4" x-pid="665" x-info="http://www.rsyslog.com"] start"#;
         pub const PATTERN_FILE: &'static str = "/home/tibi/Documents/Diplomamunka/samples/default_300.json";
     }
     pub mod pattern_200 {
-        pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = r#"plugin_dispatch_values: Dataset not found: ps_state (from "docker/plugin-inst/ps_state-blocked"), check your types.db!"#;
+        pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = "Authorized to pirar01, krb5 principal pirar01@LOCAL (krb5_kuserok)";
         pub const TEST_MESSAGE_WHICH_DOES_NOT_MATCH: &'static str = r#"[origin software="rsyslogd" swVersion="7.4.4" x-pid="665" x-info="http://www.rsyslog.com"] start"#;
         pub const PATTERN_FILE: &'static str = "/home/tibi/Documents/Diplomamunka/samples/default_200.json";
     }
     pub mod pattern_100 {
-        pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = "Warning: cgroup_attach_task_pid failed: 5236";
+        pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = "Authorized to pirar01, krb5 principal pirar01@LOCAL (krb5_kuserok)";
         pub const TEST_MESSAGE_WHICH_DOES_NOT_MATCH: &'static str = r#"[origin software="rsyslogd" swVersion="7.4.4" x-pid="665" x-info="http://www.rsyslog.com"] start"#;
         pub const PATTERN_FILE: &'static str = "/home/tibi/Documents/Diplomamunka/samples/default_100.json";
     }
