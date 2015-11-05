@@ -39,7 +39,7 @@ pub mod test_datas {
         pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = "Authorized to pirar01, krb5 principal pirar01@LOCAL (krb5_kuserok)";
         pub const TEST_MESSAGE_WHICH_DOES_NOT_MATCH: &'static str = r#"[origin software="rsyslogd" swVersion="7.4.4" x-pid="665" x-info="http://www.rsyslog.com"] start"#;
         pub const PATTERN_FILE: &'static str = "/home/tibi/Documents/Diplomamunka/samples/default_500.json";
-        pub const EXPECTED_UUID: &'static str = "e05d0227-5cae-45c9-96bd-121aef46f9b8";
+        pub const EXPECTED_UUID: &'static str = "71e3b37b-87a8-4901-824e-50bae6e789a0";
     }
     pub mod pattern_400 {
         pub const TEST_MESSAGE_WHICH_MATCHES: &'static str = "Authorized to pirar01, krb5 principal pirar01@LOCAL (krb5_kuserok)";
