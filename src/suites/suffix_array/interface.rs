@@ -3,8 +3,7 @@ use actiondb::parsers::Parser;
 use actiondb::matcher::result::MatchResult;
 
 pub trait SuffixArray: Clone {
-    type LiteralEntry: LiteralEntry;
-    type ParserEntry: ParserEntry;
+    fn new() -> Self;
     fn insert(&mut self, pattern: Pattern);
     fn longest_common_prefix(&self, value: &str) -> Option<(usize, usize)>;
 }
@@ -16,6 +15,15 @@ pub trait Entry {
     fn child(&self) -> Option<&Self::SA>;
     fn child_mut(&mut self) -> Option<&mut Self::SA>;
     fn set_child(&mut self, child: Option<Self::SA>);
+    fn insert(&mut self, pattern: Pattern) {
+        if !pattern.pattern().is_empty() {
+            let sa = Self::SA::new();
+            self.set_child(Some(sa));
+            self.child_mut().expect("Failed to get a child").insert(pattern);
+        } else {
+            self.set_pattern(Some(pattern));
+        }
+    }
 }
 
 pub trait LiteralEntry: Entry + Clone {

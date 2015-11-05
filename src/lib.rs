@@ -15,7 +15,6 @@ use actiondb::matcher::MatcherSuite;
 use actiondb::matcher::Matcher;
 use actiondb::matcher::trie::TrieMatcherSuite;
 use suites::RegexMatcherSuite;
-use suites::SuffixArrayMatcherSuite;
 
 pub fn create_matcher<T>(path: &str) -> T::Matcher
     where T: MatcherSuite {

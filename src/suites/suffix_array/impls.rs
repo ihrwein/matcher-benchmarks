@@ -23,12 +23,6 @@ pub struct SuffixTable {
 }
 
 impl SuffixTable {
-    pub fn new() -> SuffixTable {
-        SuffixTable {
-            literal_entries: Vec::new(),
-            parser_entries: Vec::new()
-        }
-    }
     fn longest_common_prefix_around_pos(&self, value: &str, pos: usize) -> (usize, usize) {
         let mut min_pos = pos;
         let mut min_len = 0;
@@ -47,48 +41,54 @@ impl SuffixTable {
         }
         (min_pos, min_len)
     }
+
+    fn insert_literal(&mut self, literal: String) -> &mut Entry<SA=SuffixTable> {
+        let result = self.literal_entries.binary_search_by(|probe| probe.literal().cmp(&literal));
+        match result {
+            Ok(pos) => {
+                self.literal_entries.get_mut(pos).expect("Failed to remove")
+            },
+            Err(pos) => {
+                let entry = LiteralE::new(literal);
+                self.literal_entries.insert(pos, entry);
+                self.literal_entries.get_mut(pos).expect("Failed to remove")
+            }
+        }
+    }
+
+    fn insert_parser(&mut self, parser: Box<Parser>) -> &mut Entry<SA=SuffixTable> {
+        let pos = self.parser_entries.iter().position(|x| {
+            x.parser.hash_os() == parser.hash_os()
+        });
+        if let Some(pos) = pos {
+            self.parser_entries.get_mut(pos).expect("Failed to remove parser entry")
+        } else {
+            let parser = ParserE::new(parser);
+            self.parser_entries.push(parser);
+            self.parser_entries.last_mut().expect("Failed to last_mut freshly inserted parser entry")
+        }
+    }
 }
 
 impl SuffixArray for SuffixTable {
-    type LiteralEntry = LiteralE;
-    type ParserEntry = ParserE;
+    fn new() -> SuffixTable {
+        SuffixTable {
+            literal_entries: Vec::new(),
+            parser_entries: Vec::new()
+        }
+    }
 
     fn insert(&mut self, mut pattern: Pattern) {
         if let Some(token) = pattern.pop_first_token() {
             let mut entry: &mut Entry<SA=SuffixTable> = match token {
                 TokenType::Literal(literal) => {
-                    let result = self.literal_entries.binary_search_by(|probe| probe.literal().cmp(&literal));
-                    match result {
-                        Ok(pos) => {
-                            self.literal_entries.get_mut(pos).expect("Failed to remove")
-                        },
-                        Err(pos) => {
-                            let entry = LiteralE::new(literal);
-                            self.literal_entries.insert(pos, entry);
-                            self.literal_entries.get_mut(pos).expect("Failed to remove")
-                        }
-                    }
+                    self.insert_literal(literal)
                 },
                 TokenType::Parser(parser) => {
-                    let pos = self.parser_entries.iter().position(|x| {
-                        x.parser.hash_os() == parser.hash_os()
-                    });
-                    if let Some(pos) = pos {
-                        self.parser_entries.get_mut(pos).expect("Failed to remove parser entry")
-                    } else {
-                        let parser = ParserE::new(parser);
-                        self.parser_entries.push(parser);
-                        self.parser_entries.last_mut().expect("Failed to last_mut freshly inserted parser entry")
-                    }
+                    self.insert_parser(parser)
                 }
             };
-            if !pattern.pattern().is_empty() {
-                let sa = SuffixTable::new();
-                entry.set_child(Some(sa));
-                entry.child_mut().expect("Failed to get a child").insert(pattern)
-            } else {
-                entry.set_pattern(Some(pattern));
-            }
+            entry.insert(pattern);
         }
     }
 

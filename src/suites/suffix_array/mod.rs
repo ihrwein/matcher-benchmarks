@@ -3,6 +3,7 @@ use actiondb::matcher::MatcherFactory;
 
 use actiondb::matcher::MatcherSuite;
 use self::impls::SuffixTable;
+use self::interface::SuffixArray;
 
 mod interface;
 mod impls;
