@@ -9,7 +9,7 @@ extern crate log;
 
 pub mod suites;
 
-use actiondb::matcher::GenericFactory;
+use actiondb::matcher::PatternLoader;
 use actiondb::matcher::MatcherFactory;
 use actiondb::matcher::MatcherSuite;
 use actiondb::matcher::Matcher;
@@ -18,7 +18,7 @@ use suites::RegexMatcherSuite;
 
 pub fn create_matcher<T>(path: &str) -> T::Matcher
     where T: MatcherSuite {
-    let result = GenericFactory::from_json_file::<T::MatcherFactory>(path);
+    let result = PatternLoader::from_json_file::<T::MatcherFactory>(path);
     if result.is_err() {
         println!("{:?}", &result);
     }
