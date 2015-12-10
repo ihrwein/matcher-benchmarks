@@ -1,5 +1,4 @@
 #![feature(plugin,const_fn)]
-#![plugin(stainless)]
 extern crate actiondb;
 extern crate regex;
 #[macro_use]
